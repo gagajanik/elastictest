@@ -35,7 +35,7 @@ public class ElasticTest<T> {
         FieldValue<String> iVal=new FieldValue<String>();
         iVal.setT("gagaa");
        // iVal.updateDocument(client,"main","person","1002","firstName",iVal.getT());
-        makeSearch(client);
+        makeSearch(client,"search1","employee");
       // insertDocument(client,"main","person","1004","nino","janikashvili",17);
         client.close();
     }
@@ -74,13 +74,13 @@ public class ElasticTest<T> {
                .endObject());
        client.update(updateRequest).get();
    }*/
-   public static void makeSearch(Client client) throws IOException {
+   public static void makeSearch(Client client, String index, String type) throws IOException {
        ObjectMapper mapper=new ObjectMapper();
-       SearchResponse response = client.prepareSearch("main")
-               .setTypes("person")
+       SearchResponse response = client.prepareSearch(index)
+               .setTypes(type)
                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-               //.setQuery(QueryBuilders.termQuery("firstName", "giga"))                 // Query
-               .setPostFilter(QueryBuilders.rangeQuery("age").from(10).to(30))
+               .setQuery(QueryBuilders.termQuery("@version", "1"))                 // Query
+              // .setPostFilter(QueryBuilders.rangeQuery("age").from(10).to(50))
                //.setPostFilter(QueryBuilders.rangeQuery("_id").from(1001).to(1005))// Filter
                .setFrom(0).setSize(60).setExplain(true)
                .get();
@@ -95,8 +95,7 @@ public class ElasticTest<T> {
                        .field("firstName", firstName)
                        .field("lastName", lastName)
                        .field("age", age)
-                       .endObject()
-               )
+                       .endObject())
                .get();
    }
     }
